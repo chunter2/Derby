@@ -10,6 +10,8 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.downbracket.gatekeeper.db.entity.LaneData;
@@ -24,6 +26,8 @@ import com.vaadin.spring.annotation.SpringComponent;
 @SpringComponent
 public class Subscriber implements MqttCallback
 {
+	private static final Logger log = LoggerFactory.getLogger(Subscriber.class);
+
     public static final String BROKER_URL = "tcp://localhost:1883";
 
 	@Autowired
@@ -34,27 +38,30 @@ public class Subscriber implements MqttCallback
 	@PostConstruct
 	public void init()
 	{
+		log.info( "initializer Subscriber");
 		try {
 			client = new MqttClient( BROKER_URL, "racesub" ) ;
-		client.setCallback( this );
-		client.connect();
-		client.subscribe("gate/race");	
+			client.setCallback( this );
+			client.connect();
+			client.subscribe("gate/race");	
 		} catch (MqttException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error( "MqttException initializing connection: " + e.getMessage(), e );
 		}
 		
 	}
 
 	
     @Override
-    public void connectionLost(Throwable cause) {}
+    public void connectionLost(Throwable cause) {
+    	log.warn( "connectionLost()!", cause );
+    	
+    }
 
     @Override
     public void messageArrived(String topic, MqttMessage message)
     {
-         System.out.println("Message arrived. Topic: " + topic + " Message: " + message.toString());
-
+         log.info("Message arrived. Topic: {}, Message: {}", topic, message ); 
+         
          try {
 			Map<Long,Long> map = new ObjectMapper().readValue(message.toString(), new TypeReference<Map<Long,Long>>(){});
 			
@@ -65,24 +72,25 @@ public class Subscriber implements MqttCallback
 			repo.save( race ) ;
 			
 		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error( "JsonParseException reading message: " + e.getMessage(), e );
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error( "JsonMappingException reading message: " + e.getMessage(), e );
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error( "IOException reading message: " + e.getMessage(), e );
 		}
 
          if ("home/LWT".equals(topic))
          {
-              System.err.println("Sensor gone!");
+ 			log.error( "Sensor gone!" );
          }
     }
 
     @Override
-    public void deliveryComplete(IMqttDeliveryToken token) {}
+    public void deliveryComplete(IMqttDeliveryToken token) 
+    {
+    	log.info( "deliveryComplete(" + token.getMessageId() + ")" );
+    	
+    }
 
 
 }

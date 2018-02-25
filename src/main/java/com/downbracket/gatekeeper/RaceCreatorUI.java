@@ -3,6 +3,8 @@ package com.downbracket.gatekeeper;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.downbracket.gatekeeper.db.entity.LaneData;
@@ -21,6 +23,8 @@ import com.vaadin.ui.UI;
 @Theme("valo")
 public class RaceCreatorUI extends UI {
 
+	private static final Logger log = LoggerFactory.getLogger(RaceCreatorUI.class);
+
     public static final String TOPIC_RACE = "gate/race";
 
 	Button bnCreate;
@@ -30,34 +34,38 @@ public class RaceCreatorUI extends UI {
 	@Autowired
 	public RaceCreatorUI() {
 		
+		log.info( "creating RaceCreatorUI");
+		
 		client = new GateMqttClient() ;
 	    this.bnCreate = new Button( "Create race", event -> createRace() ) ;
 	    
 	}
 
 	private void createRace() {
-		 
-		 RaceData race = RaceFactory.createRace( 3 ) ;
-		 
-		 Map<Long,Long> map = race.getLanes().stream().collect( Collectors.toMap( LaneData::getLaneId, LaneData::getTime ) ) ;
- 
 
-		String json;
+		log.info( "createRace() button pressed");
+
+		RaceData race = RaceFactory.createRace( 3 ) ;
+
+		Map<Long,Long> map = race.getLanes().stream().collect( Collectors.toMap( LaneData::getLaneId, LaneData::getTime ) ) ;
+
+		log.debug( "generating json for race data...");
+
 		try {
-			json = new ObjectMapper().writeValueAsString(map);
-			System.out.println(json);
-			
+			String json = new ObjectMapper().writeValueAsString(map);
+			log.debug( "send json message to topic...");
 			client.sendMessageToTopic( json, TOPIC_RACE ) ;
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error( "JsonProcessingException: " + e.getMessage(), e );
 		}
-		
+
 
 	}
 
 	@Override
 	protected void init(VaadinRequest request) {
+		
+		log.info( "initializing RaceCreatorUI");
 	    setContent(bnCreate);
 	}
 

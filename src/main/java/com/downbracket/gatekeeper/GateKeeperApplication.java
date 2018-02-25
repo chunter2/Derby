@@ -17,12 +17,14 @@ public class GateKeeperApplication {
 	private static final Logger log = LoggerFactory.getLogger(GateKeeperApplication.class);
 
 	public static void main(String[] args) {
+		log.info( "Creating SpringApplication for GateKeeper");
 		SpringApplication.run(GateKeeperApplication.class, args);
 	}
 
 
 	@Bean
 	public CommandLineRunner loadData(RaceRepository repository) {
+		log.info( "loadData into repo");
 		return (args) -> {
 			// save a couple of races
 			repository.save( RaceFactory.createRace( 3 ) ) ;
