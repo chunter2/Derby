@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -21,6 +22,9 @@ public class RaceData {
 	@GeneratedValue
 	private Long id;
 
+	@Column(name="unique_id", unique=true)
+	private String uniqueId ;
+	
 	private Date timeStamp;
 
 	// added fetchtype here to avoid session closing when lazy loading.
@@ -29,6 +33,12 @@ public class RaceData {
 
 	public RaceData() {
 		timeStamp = Calendar.getInstance().getTime() ;
+	}
+	
+	public RaceData( String uniqueId )
+	{
+		this();
+		this.uniqueId = uniqueId ;
 	}
 
 	public Long getId() {
@@ -52,9 +62,16 @@ public class RaceData {
 		lane.setRaceData(this);
 	}
 
-	public void removeLane(LaneData lane) {
-		lanes.remove(lane);
-		lane.setRaceData(null);
+	public List<LaneData> getLanes() {
+		return lanes ;
+	}
+
+	public String getUniqueId() {
+		return uniqueId;
+	}
+
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
 	}
 
 	@Override
@@ -62,8 +79,5 @@ public class RaceData {
 		return String.format("Race[id=%s, timestamp='%s', %s]", id, timeStamp.toString(), lanes.toString());
 	}
 
-	public List<LaneData> getLanes() {
-		return lanes ;
-	}
 
 }

@@ -19,7 +19,7 @@ public class LaneData {
 	private Long laneId ;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "race_id")
+	@JoinColumn(name = "unique_id")
 	private RaceData raceData;
 
 	private Long time;

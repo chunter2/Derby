@@ -2,6 +2,7 @@ package com.downbracket.gatekeeper.db.entity.factory;
 
 import java.util.Calendar;
 import java.util.Random;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class RaceFactory {
 		log.info( "createRace(count={}, meanms={}, stddev={})", count, meanms, stddev);
 		
 		RaceData race = new RaceData() ;
-//		race.setId( UUID.randomUUID().toString() );
+		race.setUniqueId( UUID.randomUUID().toString() );
 		race.setTimeStamp( Calendar.getInstance().getTime() ) ;
 		
 		for( long index = 0 ; index < count ; index++ )

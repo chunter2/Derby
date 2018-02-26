@@ -1,6 +1,8 @@
 package com.downbracket.gatekeeper;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -47,8 +49,10 @@ public class RaceCreatorUI extends UI {
 
 		RaceData race = RaceFactory.createRace( 3 ) ;
 
-		Map<Long,Long> map = race.getLanes().stream().collect( Collectors.toMap( LaneData::getLaneId, LaneData::getTime ) ) ;
-
+		Map<Long,Long> lmap = race.getLanes().stream().collect( Collectors.toMap( LaneData::getLaneId, LaneData::getTime ) ) ;
+		Map<String,Map<Long,Long>> map = new HashMap<>() ;
+		map.put( UUID.randomUUID().toString(), lmap ) ;
+		
 		log.debug( "generating json for race data...");
 
 		try {

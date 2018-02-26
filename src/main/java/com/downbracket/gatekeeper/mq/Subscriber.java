@@ -63,14 +63,17 @@ public class Subscriber implements MqttCallback
          log.info("Message arrived. Topic: {}, Message: {}", topic, message ); 
          
          try {
-			Map<Long,Long> map = new ObjectMapper().readValue(message.toString(), new TypeReference<Map<Long,Long>>(){});
+        	 Map<String,Map<Long,Long>> map = new ObjectMapper().readValue(message.toString(), new TypeReference<Map<String,Map<Long,Long>>>(){});
 			
-			RaceData race = new RaceData() ;
+        	 map.entrySet().stream().forEach(
+        			 entry -> {
+        	 
+						RaceData race = new RaceData( entry.getKey() ) ;
+						
+						entry.getValue().entrySet().stream().forEach( m -> race.addLane( new LaneData( m.getKey(), m.getValue() ) ) );
 			
-			map.entrySet().stream().forEach( m -> race.addLane( new LaneData( m.getKey(), m.getValue() ) ) );
-
-			repo.save( race ) ;
-			
+						repo.save( race ) ;
+        			 } );
 		} catch (JsonParseException e) {
 			log.error( "JsonParseException reading message: " + e.getMessage(), e );
 		} catch (JsonMappingException e) {
