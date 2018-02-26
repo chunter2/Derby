@@ -1,6 +1,7 @@
 package com.downbracket.gatekeeper.db.entity.factory;
 
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -44,6 +45,14 @@ public class RaceFactory {
 			race.addLane( new LaneData( index, getTime(meanms, stddev) ));
 		
 		log.info( "created new race: {}", race );
+		
+		return race ;
+	}
+
+	public static RaceData createRace(String key, Map<Long, Long> value) {
+		RaceData race = new RaceData( key ) ;
+		
+		value.entrySet().stream().forEach( m -> race.addLane( new LaneData( m.getKey(), m.getValue() ) ) );
 		
 		return race ;
 	}
