@@ -14,8 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.downbracket.gatekeeper.db.entity.Gate;
 import com.downbracket.gatekeeper.db.entity.factory.RaceFactory;
-import com.downbracket.gatekeeper.db.repository.RaceRepository;
+import com.downbracket.gatekeeper.db.repository.GateRepository;
+import com.downbracket.gatekeeper.db.repository.RaceDataRepository;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,13 +29,13 @@ public class RaceToDbSubscriber implements MqttCallback
 {
 	private static final Logger log = LoggerFactory.getLogger(RaceToDbSubscriber.class);
 
-    public static final String BROKER_URL = "tcp://localhost:1883";
-    public static final String RACE_QUEUE = "gate/race";
-
     public static final String SUBSCRIBER_NAME = "subscriber-race2db";
 
 	@Autowired
-	RaceRepository repo ;
+	RaceDataRepository repo ;
+	
+	@Autowired
+	GateRepository gateRepo ;
 	
 	private MqttClient client ;
 	
@@ -51,10 +53,10 @@ public class RaceToDbSubscriber implements MqttCallback
 		{
 			log.info( "initializer Race2DbSubscriber");
 			try {
-				client = new MqttClient( BROKER_URL, SUBSCRIBER_NAME ) ;
+				client = new MqttClient( MqConfig.BROKER_URL, SUBSCRIBER_NAME ) ;
 				client.setCallback( this );
 				client.connect();
-				client.subscribe( RACE_QUEUE );	
+				client.subscribe( MqConfig.RACE_TOPIC_NAME );	
 			} catch (MqttException e) {
 				log.error( "MqttException initializing connection: " + e.getMessage(), e );
 			}
@@ -69,15 +71,28 @@ public class RaceToDbSubscriber implements MqttCallback
     	log.warn( "connectionLost()!", cause );
     }
 
+    protected Gate getGateId( String topic )
+    {
+    	int indexStar = MqConfig.RACE_TOPIC_NAME.indexOf( '+' ) ;
+    	
+    	String gateId = topic.substring( indexStar, topic.length() - MqConfig.RACE_TOPIC_NAME.length() + indexStar + 1) ;
+    	
+    	Gate gate = gateRepo.findByUniqueId( gateId ) ;
+    	
+    	return gate ;
+    }
+    
     @Override
     public void messageArrived(String topic, MqttMessage message)
     {
          log.info("Message arrived. Topic: {}, Message: {}", topic, message ); 
          
+         Gate gate = getGateId( topic ) ;
+         
          try {
         	 Map<String,Map<Long,Long>> map = om.readValue(message.toString(), new TypeReference<Map<String,Map<Long,Long>>>(){});
-			
-        	 map.entrySet().stream().forEach( entry -> repo.save( RaceFactory.createRace( entry.getKey(), entry.getValue() ) ) );
+			 
+        	 map.entrySet().stream().forEach( entry -> repo.save( RaceFactory.createRace( gate, entry.getKey(), entry.getValue() ) ) );
 
          } catch (JsonParseException e) {
         	 log.error( "JsonParseException reading message: " + e.getMessage(), e );

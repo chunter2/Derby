@@ -2,14 +2,8 @@ package com.downbracket.gatekeeper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import com.downbracket.gatekeeper.db.entity.RaceData;
-import com.downbracket.gatekeeper.db.entity.factory.RaceFactory;
-import com.downbracket.gatekeeper.db.repository.RaceRepository;
 
 @SpringBootApplication
 public class GateKeeperApplication {
@@ -22,18 +16,21 @@ public class GateKeeperApplication {
 	}
 
 
-	@Bean
-	public CommandLineRunner loadData(RaceRepository repository) {
+/*	@Bean
+	public CommandLineRunner loadData(GateRepository gateRepository, RaceDataRepository raceRepository) {
 		log.info( "loadData into repo");
 		return (args) -> {
+			
+			Gate gate = RaceCreatorUI.getGate() ;
+			gateRepository.save( gate ) ; 
+			
 			// save a couple of races
-			repository.save( RaceFactory.createRace( 3 ) ) ;
-			repository.save( RaceFactory.createRace( 3 ) ) ;
-			repository.save( RaceFactory.createRace( 3 ) ) ;
-			repository.save( RaceFactory.createRace( 3 ) ) ;
-			repository.save( RaceFactory.createRace( 3 ) ) ;
-
-/*			// fetch all races
+			for( int index = 0 ; index < 2 ; index ++ )
+			{
+				RaceData race = RaceFactory.createRace( gate, 3 ) ;
+				raceRepository.save( race ) ;
+			}
+			// fetch all races
 			log.info("Races found with findAll():");
 			log.info("-------------------------------");
 			for (RaceData race : repository.findAll()) {
@@ -47,7 +44,9 @@ public class GateKeeperApplication {
 			log.info("--------------------------------");
 			log.info(race.toString());
 			log.info("");
-*/
+
 };
 	}
+*/
+	
 }

@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,9 +24,14 @@ public class RaceData {
 	@GeneratedValue
 	private Long id;
 
-	@Column(name="unique_id", unique=true)
+	@Column(name="unique_id", unique=true, length=36)
 	private String uniqueId ;
 	
+	@JoinColumn(name = "gate")
+	@ManyToOne(targetEntity = Gate.class, fetch = FetchType.EAGER)
+//	@NotNull(message = "Gate not set")
+	private Gate gate;
+
 	private Date timeStamp;
 
 	// added fetchtype here to avoid session closing when lazy loading.
@@ -35,9 +42,10 @@ public class RaceData {
 		timeStamp = Calendar.getInstance().getTime() ;
 	}
 	
-	public RaceData( String uniqueId )
+	public RaceData( Gate gate, String uniqueId )
 	{
 		this();
+		this.gate = gate ;
 		this.uniqueId = uniqueId ;
 	}
 
@@ -64,6 +72,14 @@ public class RaceData {
 
 	public List<LaneData> getLanes() {
 		return lanes ;
+	}
+
+	public Gate getGate() {
+		return gate;
+	}
+
+	public void setGate(Gate gate) {
+		this.gate = gate;
 	}
 
 	public String getUniqueId() {

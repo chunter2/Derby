@@ -1,26 +1,27 @@
-package com.downbracket.gatekeeper;
+package com.downbracket.gatekeeper.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.downbracket.gatekeeper.db.entity.RaceData;
-import com.downbracket.gatekeeper.db.repository.RaceRepository;
+import com.downbracket.gatekeeper.db.entity.Gate;
+import com.downbracket.gatekeeper.db.repository.GateRepository;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.UI;
 
-@SpringUI
+@SpringUI(path="/gates")
 @Theme("valo")
-public class VaadinUI extends UI {
+public class GateDataUI extends UI {
 	
-	RaceRepository repo;
-	Grid<RaceData> grid;
+	GateRepository repo;
+	Grid<Gate> grid;
 
 	@Autowired
-	public VaadinUI(RaceRepository repo) {
+	public GateDataUI(GateRepository repo) {
 	    this.repo = repo;
-	    this.grid = new Grid<>(RaceData.class);
+	    this.grid = new Grid<>(Gate.class);
+	    this.grid.setWidth("100%");
 	}
 
 	@Override
@@ -31,5 +32,6 @@ public class VaadinUI extends UI {
 
 	private void listRaces() {
 	    grid.setItems(repo.findAll());
+//	    grid.setItems(repo.findByGateUniqueId( RaceCreatorUI.GATE_UUID));
 	}
 }

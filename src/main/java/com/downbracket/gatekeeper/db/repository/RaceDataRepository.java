@@ -1,10 +1,13 @@
 package com.downbracket.gatekeeper.db.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.downbracket.gatekeeper.db.entity.RaceData;
 
-public interface RaceRepository extends JpaRepository<RaceData, Long> {
+public interface RaceDataRepository extends JpaRepository<RaceData, Long> {
 
-//	List<Race> findByLastNameStartsWithIgnoreCase(String lastName);
+	List<RaceData> findByGateUniqueId( String uniqueId ) ;
+
 }

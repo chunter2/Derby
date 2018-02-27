@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.downbracket.gatekeeper.db.entity.Gate;
 import com.downbracket.gatekeeper.db.entity.LaneData;
 import com.downbracket.gatekeeper.db.entity.RaceData;
 
@@ -22,9 +23,9 @@ public class RaceFactory {
 		// hidden constructor
 	}
 
-	public static RaceData createRace( int count )
+	public static RaceData createRace( Gate gate, int count )
 	{
-		return createRace( count, 4000, 1000 ) ;
+		return createRace( gate, count, 4000, 1000 ) ;
 	}
 	
 	private static long getTime( int meanms, int stddev )
@@ -33,11 +34,13 @@ public class RaceFactory {
 		return (long)d;
 	}
 	
-	public static RaceData createRace( int count, int meanms, int stddev ) 
+	public static RaceData createRace( Gate gate, int count, int meanms, int stddev ) 
 	{
-		log.info( "createRace(count={}, meanms={}, stddev={})", count, meanms, stddev);
+		log.info( "createRace(gateId={}, count={}, meanms={}, stddev={})", 
+				gate.getUniqueId(), count, meanms, stddev);
 		
 		RaceData race = new RaceData() ;
+		race.setGate(gate);
 		race.setUniqueId( UUID.randomUUID().toString() );
 		race.setTimeStamp( Calendar.getInstance().getTime() ) ;
 		
@@ -49,8 +52,8 @@ public class RaceFactory {
 		return race ;
 	}
 
-	public static RaceData createRace(String key, Map<Long, Long> value) {
-		RaceData race = new RaceData( key ) ;
+	public static RaceData createRace( Gate gate, String key, Map<Long, Long> value) {
+		RaceData race = new RaceData( gate, key ) ;
 		
 		value.entrySet().stream().forEach( m -> race.addLane( new LaneData( m.getKey(), m.getValue() ) ) );
 		
