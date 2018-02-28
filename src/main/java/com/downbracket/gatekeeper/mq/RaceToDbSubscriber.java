@@ -71,13 +71,11 @@ public class RaceToDbSubscriber implements MqttCallback
     	log.warn( "connectionLost()!", cause );
     }
 
-    protected Gate getGate( String topic )
+    protected static String getGateId( String topic )
     {
     	int indexStar = MqConfig.RACE_TOPIC_NAME.indexOf( '+' ) ;
     	
-    	String gateId = topic.substring( indexStar, topic.length() - MqConfig.RACE_TOPIC_NAME.length() + indexStar + 1) ;
-    	
-    	return gateService.getOrCreateGate( gateId, "mq gate" ) ;
+    	return topic.substring( indexStar, topic.length() - MqConfig.RACE_TOPIC_NAME.length() + indexStar + 1) ;
     }
     
     @Override
@@ -85,7 +83,7 @@ public class RaceToDbSubscriber implements MqttCallback
     {
          log.info("Message arrived. Topic: {}, Message: {}", topic, message ); 
          
-         Gate gate = getGate( topic ) ;
+         Gate gate = gateService.getOrCreateGate( getGateId( topic ), "mq gate" ) ;
          
          try {
         	 Map<String,Map<Long,Long>> map = om.readValue(message.toString(), new TypeReference<Map<String,Map<Long,Long>>>(){});
