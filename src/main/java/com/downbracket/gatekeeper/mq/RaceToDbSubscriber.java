@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.downbracket.gatekeeper.db.entity.Gate;
 import com.downbracket.gatekeeper.db.entity.factory.RaceFactory;
-import com.downbracket.gatekeeper.db.repository.GateRepository;
 import com.downbracket.gatekeeper.db.repository.RaceDataRepository;
+import com.downbracket.gatekeeper.db.service.GateService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,7 +35,7 @@ public class RaceToDbSubscriber implements MqttCallback
 	RaceDataRepository repo ;
 	
 	@Autowired
-	GateRepository gateRepo ;
+	GateService gateService ;
 	
 	private MqttClient client ;
 	
@@ -71,15 +71,13 @@ public class RaceToDbSubscriber implements MqttCallback
     	log.warn( "connectionLost()!", cause );
     }
 
-    protected Gate getGateId( String topic )
+    protected Gate getGate( String topic )
     {
     	int indexStar = MqConfig.RACE_TOPIC_NAME.indexOf( '+' ) ;
     	
     	String gateId = topic.substring( indexStar, topic.length() - MqConfig.RACE_TOPIC_NAME.length() + indexStar + 1) ;
     	
-    	Gate gate = gateRepo.findByUniqueId( gateId ) ;
-    	
-    	return gate ;
+    	return gateService.getOrCreateGate( gateId, "mq gate" ) ;
     }
     
     @Override
@@ -87,7 +85,7 @@ public class RaceToDbSubscriber implements MqttCallback
     {
          log.info("Message arrived. Topic: {}, Message: {}", topic, message ); 
          
-         Gate gate = getGateId( topic ) ;
+         Gate gate = getGate( topic ) ;
          
          try {
         	 Map<String,Map<Long,Long>> map = om.readValue(message.toString(), new TypeReference<Map<String,Map<Long,Long>>>(){});

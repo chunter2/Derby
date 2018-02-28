@@ -1,20 +1,27 @@
 package com.downbracket.gatekeeper.db.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.NaturalId;
+
 @Entity(name = "Gate")
 @Table(name = "gate")
-public class Gate {
+public class Gate implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 	
-	@Column( length=36 )
+	@NaturalId
+	@Column( name="unique_id", unique=true, length=36 )
 	private String uniqueId;
 	
 	private String name ;

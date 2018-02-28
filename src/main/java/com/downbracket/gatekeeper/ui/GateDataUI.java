@@ -14,12 +14,13 @@ import com.vaadin.ui.UI;
 @Theme("valo")
 public class GateDataUI extends UI {
 	
-	GateRepository repo;
+	
+	@Autowired
+	GateRepository repo  ;
+	
 	Grid<Gate> grid;
 
-	@Autowired
-	public GateDataUI(GateRepository repo) {
-	    this.repo = repo;
+	public GateDataUI() {
 	    this.grid = new Grid<>(Gate.class);
 	    this.grid.setWidth("100%");
 	}
@@ -32,6 +33,5 @@ public class GateDataUI extends UI {
 
 	private void listRaces() {
 	    grid.setItems(repo.findAll());
-//	    grid.setItems(repo.findByGateUniqueId( RaceCreatorUI.GATE_UUID));
 	}
 }

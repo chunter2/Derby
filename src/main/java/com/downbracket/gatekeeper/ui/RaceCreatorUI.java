@@ -20,7 +20,7 @@ import com.downbracket.gatekeeper.db.entity.Gate;
 import com.downbracket.gatekeeper.db.entity.LaneData;
 import com.downbracket.gatekeeper.db.entity.RaceData;
 import com.downbracket.gatekeeper.db.entity.factory.RaceFactory;
-import com.downbracket.gatekeeper.db.repository.GateRepository;
+import com.downbracket.gatekeeper.db.service.GateService;
 import com.downbracket.gatekeeper.mq.MqConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +43,7 @@ public class RaceCreatorUI extends UI {
     private MqttClient client;
 	
 	@Autowired
-	GateRepository gateRepo ;
+	GateService gateService;
 
 	Gate gate ;
 	
@@ -59,18 +59,7 @@ public class RaceCreatorUI extends UI {
 	
 	private Gate getGate()
 	{
-		if( gate == null )
-		{
-			gate = gateRepo.findByUniqueId( GATE_UUID ) ;
-			
-			if( gate == null )
-			{
-				gate = new Gate( GATE_UUID, "UI Gate" ) ;
-				gateRepo.save( gate ) ;
-			}
-		}
-		
-		return gate ;
+		return gateService.getOrCreateGate( GATE_UUID, "UI Gate" ) ;
 	}
 
 	private void createRace() {
@@ -94,8 +83,6 @@ public class RaceCreatorUI extends UI {
 		} catch (JsonProcessingException e) {
 			log.error( "JsonProcessingException: " + e.getMessage(), e );
 		}
-
-
 	}
 
 	@Override
@@ -139,7 +126,7 @@ public class RaceCreatorUI extends UI {
 
     private void sendMessageToTopic( String message, String topic ) {
 
-    	final MqttTopic temperatureTopic = client.getTopic(topic);
+    	final MqttTopic temperatureTopic = getMqttClient().getTopic(topic);
     	try {
     		temperatureTopic.publish(new MqttMessage(message.getBytes()));
     	} catch (MqttPersistenceException e) {

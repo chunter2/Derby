@@ -45,7 +45,7 @@ public class RaceFactory {
 		race.setTimeStamp( Calendar.getInstance().getTime() ) ;
 		
 		for( long index = 0 ; index < count ; index++ )
-			race.addLane( new LaneData( index, getTime(meanms, stddev) ));
+			race.addLane( new LaneData( index, getTime(meanms, stddev)+index*stddev/10 ));
 		
 		log.info( "created new race: {}", race );
 		

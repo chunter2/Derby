@@ -1,5 +1,7 @@
 package com.downbracket.gatekeeper.db.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,7 +12,9 @@ import javax.persistence.Table;
 
 @Entity(name = "LaneData")
 @Table(name = "lane_data")
-public class LaneData {
+public class LaneData implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
@@ -19,8 +23,8 @@ public class LaneData {
 	private Long laneId ;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "unique_id")
-	private RaceData raceData;
+	@JoinColumn(name = "race_unique_id", referencedColumnName = "unique_id" )
+	private RaceData raceData; 
 
 	private Long time;
 	

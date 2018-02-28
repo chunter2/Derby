@@ -17,7 +17,7 @@ public class RaceToDbSubscriberTest {
 		
 		String topic = MqConfig.RACE_TOPIC_NAME.replace("*", uuid ) ;
 		
-		assertEquals( uuid, r2d.getGateId( topic ) ) ;
+		assertEquals( uuid, r2d.getGate( topic ) ) ;
 	}
 
 }

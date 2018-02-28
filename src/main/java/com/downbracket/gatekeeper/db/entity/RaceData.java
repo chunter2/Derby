@@ -1,5 +1,6 @@
 package com.downbracket.gatekeeper.db.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,19 +17,24 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.NaturalId;
+
 @Entity(name = "RaceData")
 @Table(name = "race_data")
-public class RaceData {
+public class RaceData implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
+	@NaturalId
 	@Column(name="unique_id", unique=true, length=36)
 	private String uniqueId ;
 	
-	@JoinColumn(name = "gate")
-	@ManyToOne(targetEntity = Gate.class, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "gate_unique_id", referencedColumnName = "unique_id" )
 //	@NotNull(message = "Gate not set")
 	private Gate gate;
 
